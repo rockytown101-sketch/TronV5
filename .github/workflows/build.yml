@@ -15,13 +15,20 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+
+  # ============================================================
+  # 1. 基础检查
+  # ============================================================
   check:
     name: Static checks
     runs-on: ubuntu-latest
+
     defaults:
       run:
         working-directory: desktop
+
     steps:
+
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -38,14 +45,21 @@ jobs:
       - name: Run desktop checks
         run: npm run check
 
+
+  # ============================================================
+  # 2. Windows x64
+  # ============================================================
   build-windows:
     name: Windows x64
     needs: check
     runs-on: windows-latest
+
     defaults:
       run:
         working-directory: desktop
+
     steps:
+
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -60,7 +74,11 @@ jobs:
         run: npm install --no-audit --no-fund
 
       - name: Build NSIS installer and portable EXE
-        run: npx electron-builder --win nsis portable --x64 --publish never
+        run: npm run dist:win
+
+      - name: List generated files
+        shell: pwsh
+        run: Get-ChildItem -Path dist -Recurse
 
       - name: Upload Windows artifacts
         uses: actions/upload-artifact@v4
@@ -70,14 +88,21 @@ jobs:
           if-no-files-found: error
           retention-days: 30
 
+
+  # ============================================================
+  # 3. macOS Intel x64
+  # ============================================================
   build-macos-intel:
     name: macOS Intel x64
     needs: check
     runs-on: macos-15-intel
+
     defaults:
       run:
         working-directory: desktop
+
     steps:
+
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -92,7 +117,10 @@ jobs:
         run: npm install --no-audit --no-fund
 
       - name: Build macOS Intel DMG and ZIP
-        run: npx electron-builder --mac dmg zip --x64 --publish never
+        run: npm run dist:mac:x64
+
+      - name: List generated files
+        run: ls -lah dist
 
       - name: Upload macOS Intel artifacts
         uses: actions/upload-artifact@v4
@@ -102,14 +130,21 @@ jobs:
           if-no-files-found: error
           retention-days: 30
 
+
+  # ============================================================
+  # 4. macOS Apple Silicon ARM64
+  # ============================================================
   build-macos-arm64:
     name: macOS Apple Silicon arm64
     needs: check
-    runs-on: macos-14
+    runs-on: macos-15
+
     defaults:
       run:
         working-directory: desktop
+
     steps:
+
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -124,9 +159,12 @@ jobs:
         run: npm install --no-audit --no-fund
 
       - name: Build macOS Apple Silicon DMG and ZIP
-        run: npx electron-builder --mac dmg zip --arm64 --publish never
+        run: npm run dist:mac:arm64
 
-      - name: Upload macOS arm64 artifacts
+      - name: List generated files
+        run: ls -lah dist
+
+      - name: Upload macOS ARM64 artifacts
         uses: actions/upload-artifact@v4
         with:
           name: tron-permission-control-v5.0.2-macos-arm64
@@ -134,15 +172,25 @@ jobs:
           if-no-files-found: error
           retention-days: 30
 
+
+  # ============================================================
+  # 5. GitHub Release
+  #    只有使用 v* Tag 时才执行
+  # ============================================================
   release:
     name: Publish GitHub Release assets
+
     if: startsWith(github.ref, 'refs/tags/')
+
     needs:
       - build-windows
       - build-macos-intel
       - build-macos-arm64
+
     runs-on: ubuntu-latest
+
     steps:
+
       - name: Download Windows artifacts
         uses: actions/download-artifact@v4
         with:
