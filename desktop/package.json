@@ -1,0 +1,111 @@
+{
+  "name": "tron-permission-control-desktop",
+  "version": "5.0.2",
+  "private": true,
+  "description": "TRON Permission Control V5 - Electron desktop client",
+  "author": "TRON Permission Control",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "electron .",
+    "check": "node --check src/main.js && node --check src/preload.js && node --check src/permission-rules.js && node --check src/transfer-watch-rules.js",
+    "dist": "electron-builder --publish never",
+    "dist:win": "electron-builder --win nsis portable --x64 --publish never",
+    "dist:mac:x64": "electron-builder --mac dmg zip --x64 --publish never",
+    "dist:mac:arm64": "electron-builder --mac dmg zip --arm64 --publish never",
+    "postinstall": "electron-builder install-app-deps"
+  },
+  "dependencies": {
+    "tronweb": "^6.0.4"
+  },
+  "devDependencies": {
+    "electron": "37.2.6",
+    "electron-builder": "26.15.3"
+  },
+  "build": {
+    "appId": "com.tron.permissioncontrol.v5",
+    "productName": "TRON Permission Control V5",
+    "artifactName": "TRON-Permission-Control-V5.0.2-${os}-${arch}.${ext}",
+    "electronVersion": "37.2.6",
+    "asar": true,
+    "compression": "normal",
+    "npmRebuild": true,
+    "files": [
+      "src/**/*",
+      "package.json"
+    ],
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "artifactName": "TRON-Permission-Control-V5.0.2-Windows-${arch}.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "TRON Permission Control V5"
+    },
+    "portable": {
+      "artifactName": "TRON-Permission-Control-V5.0.2-Windows-Portable-${arch}.${ext}"
+    },
+    "mac": {
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        },
+        {
+          "target": "zip",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        }
+      ],
+      "category": "public.app-category.utilities",
+      "hardenedRuntime": false,
+      "artifactName": "TRON-Permission-Control-V5.0.2-macOS-${arch}.${ext}"
+    },
+    "dmg": {
+      "title": "TRON Permission Control V5",
+      "iconSize": 96,
+      "window": {
+        "width": 540,
+        "height": 360
+      },
+      "contents": [
+        {
+          "x": 140,
+          "y": 180
+        },
+        {
+          "x": 400,
+          "y": 180,
+          "type": "link",
+          "path": "/Applications"
+        }
+      ]
+    },
+    "publish": null
+  }
+}
