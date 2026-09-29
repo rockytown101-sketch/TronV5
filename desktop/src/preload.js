@@ -1,0 +1,11 @@
+const{contextBridge,ipcRenderer}=require('electron');
+contextBridge.exposeInMainWorld('api',{
+  configGet:()=>ipcRenderer.invoke('config:get'),configSet:p=>ipcRenderer.invoke('config:set',p),
+  validateAddress:a=>ipcRenderer.invoke('tron:validate-address',a),permissions:a=>ipcRenderer.invoke('tron:permissions',a),
+  buildPermissionUpdate:p=>ipcRenderer.invoke('tron:build-permission-update',p),sign:p=>ipcRenderer.invoke('tron:sign',p),
+  permissionPreflight:p=>ipcRenderer.invoke('tron:permission-preflight',p),
+  executePermissionUpdate:p=>ipcRenderer.invoke('tron:execute-permission-update',p),
+  getSignWeight:t=>ipcRenderer.invoke('tron:get-sign-weight',t),broadcast:t=>ipcRenderer.invoke('tron:broadcast',t),
+  forcePendingPopup:r=>ipcRenderer.invoke('pending:show',r),closePendingPopup:()=>ipcRenderer.invoke('pending:later'),
+  error:m=>ipcRenderer.invoke('dialog:error',m)
+});

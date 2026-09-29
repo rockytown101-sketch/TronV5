@@ -1,0 +1,1 @@
+{"name":"tron-permission-control-server","version":"5.0.2","private":true,"main":"src/index.js","scripts":{"start":"node src/index.js","check":"node --check src/index.js && node --check src/rules.js && node --check src/store.js && node --check src/watcher.js","test":"node ../tests/server.test.js"},"dependencies":{"express":"^4.21.2","pg":"^8.16.3","tronweb":"^6.0.4"}}
